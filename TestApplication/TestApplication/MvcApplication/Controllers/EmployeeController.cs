@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
 using System.Web.Mvc;
-using TestApplication.Models;
+using MvcApplication.Models;
 
-namespace TestApplication.Controllers
+namespace MvcApplication.Controllers
 {
     public class EmployeeController : Controller
     {
@@ -16,16 +13,21 @@ namespace TestApplication.Controllers
 
         public ActionResult GetEmployee(int id)
         {
-            Employee emp = EmployeeStore.EmployeeList.FirstOrDefault(x => x.EmpId == id);
+            var emp = EmployeeStore.EmployeeList.FirstOrDefault(x => x.EmpId == id);
             return View("EmployeeDetail", emp);
         }
 
         [HttpPost]
         public ActionResult SetEmployee(Employee emp)
         {
-            Employee employee = EmployeeStore.EmployeeList.FirstOrDefault(x => x.EmpId == emp.EmpId);
+            var employee = EmployeeStore.EmployeeList.FirstOrDefault(x => x.EmpId == emp.EmpId);
+            if (employee == null)
+            {
+                return View("EmployeeDetail", emp);
+            }
             employee.Name = emp.Name;
             employee.Salary = emp.Salary;
+
             return View("EmployeeDetail", emp);
         }
 
@@ -37,7 +39,7 @@ namespace TestApplication.Controllers
         [HttpPost]
         public ActionResult AddEmployee(Employee emp)
         {
-            EmployeeStore.EmployeeList.Add(new Employee()
+            EmployeeStore.EmployeeList.Add(new Employee
             {
                 EmpId = EmployeeStore.EmployeeList.Count == 0 ? 1 : EmployeeStore.EmployeeList.Max(x => x.EmpId) + 1,
                 Name = emp.Name,

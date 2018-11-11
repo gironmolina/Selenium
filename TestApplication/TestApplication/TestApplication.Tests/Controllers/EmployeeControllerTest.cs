@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing.Imaging;
 using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OpenQA.Selenium;
@@ -45,6 +44,43 @@ namespace TestApplication.Tests.Controllers
             }
         }
 
+        private void TestAddEmployee(IWebDriver driver)
+        {
+            driver.FindElement(By.LinkText("Add")).Click();
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            var name = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.Id("Name")));
+            var sal = driver.FindElement(By.Id("Sal"));
+            var submit = driver.FindElement(By.Id("Submit"));
+
+            name.SendKeys("Natasha");
+            sal.SendKeys("5000");
+            submit.Click();
+
+            IAlert alert = null;
+            alert = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.AlertIsPresent());
+            alert.Accept();
+        }
+
+        private void TestEditEmployee(IWebDriver driver)
+        {
+            //Find the element anchor tag for the employee having name as 'Anderson'
+            var anchorTag = (IWebElement)((IJavaScriptExecutor)driver).ExecuteScript("return $('a',$(\"td:contains('Anderson')\").parent())[0]");
+            anchorTag.Click();
+
+            //Wait and then check until the control with id=Name is available
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+            var name = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementIsVisible(By.Id("Name")));
+            var submit = driver.FindElement(By.Id("Submit"));
+
+            //Set the data (Change the name)
+            name.SendKeys(" James");
+            submit.Click();
+
+            IAlert alert = null;
+            alert = wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.AlertIsPresent());
+            alert.Accept();
+        }
+
         private void TestDeleteEmployees(IWebDriver driver)
         {
             //Find the last employee
@@ -56,61 +92,14 @@ namespace TestApplication.Tests.Controllers
             Thread.Sleep(1000);
             delBtn.Click(); // Perform delete operation
             Thread.Sleep(1000);
-
         }
-
-        private void TestEditEmployee(IWebDriver driver)
-        {
-            //Find the element anchor tag for the employee having name as 'Anderson'
-            var anchorTag = (IWebElement)((IJavaScriptExecutor)driver).ExecuteScript("return $('a',$(\"td:contains('Anderson')\").parent())[0]");
-            anchorTag.Click();
-
-            //Wait and then check until the control with id=Name is available
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(d => d.FindElement(By.Id("Name")));
-
-            //Find all the elements
-            var name = driver.FindElement(By.Id("Name"));
-            var submit = driver.FindElement(By.Id("Submit"));
-
-            //Set the data (Change the name)
-            name.SendKeys(" James");
-            submit.Click();
-
-            IAlert alert = null;
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(d => { alert = d.SwitchTo().Alert(); return alert; });
-            alert.Accept();
-        }
-
-        private void TestAddEmployee(IWebDriver driver)
-        {
-            driver.FindElement(By.LinkText("Add")).Click();
-            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(d => d.FindElement(By.Id("Name")));
-
-            var name = driver.FindElement(By.Id("Name"));
-            var sal = driver.FindElement(By.Id("Sal"));
-            var submit = driver.FindElement(By.Id("Submit"));
-
-            name.SendKeys("Natasha");
-            sal.SendKeys("5000");
-            submit.Click();
-
-            IAlert alert = null;
-            wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(d => { alert = d.SwitchTo().Alert(); return alert; });
-            alert.Accept();
-        }
-
 
         public void TestEmployeeListScreen(IWebDriver driver, string type)
         {
             var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            wait.Until(d => d.Title.ToLower().StartsWith("employeelist"));
+            wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.TitleIs("EmployeeList"));
             var ss = ((ITakesScreenshot)driver).GetScreenshot();
-            ss.SaveAsFile(ScreenShotLocation + "\\" + type + "EmpList.jpeg", ImageFormat.Jpeg);
+            ss.SaveAsFile(ScreenShotLocation + "\\" + type + "EmpList.jpeg", ScreenshotImageFormat.Jpeg);
         }
-
     }
 }
