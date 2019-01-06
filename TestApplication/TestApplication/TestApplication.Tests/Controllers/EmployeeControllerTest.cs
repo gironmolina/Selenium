@@ -14,6 +14,38 @@ namespace TestApplication.Tests.Controllers
         private const string ScreenShotLocation = @"C:\ScreenShot";
 
         [TestMethod]
+        public void GetComboBox()
+        {
+            IWebDriver driver = null;
+            try
+            {
+                driver = new ChromeDriver(BrowserDriverPath);
+                driver.Navigate().GoToUrl("http://tickets.vueling.com/");
+
+                var kids = driver.FindElement(By.Id("AvailabilitySearchInputSearchView_DropDownListPassengerType_CHD"));
+                var selectElement = new SelectElement(kids);
+                selectElement.SelectByValue("2");
+
+                driver.FindElement(By.Id("AvailabilitySearchInputSearchView_TextBoxMarketOrigin1")).Click();
+                var stationListOrigin = driver.FindElement(By.Id("stationsList"));
+                var barcelona = stationListOrigin.FindElement(By.LinkText("Barcelona, España (BCN)"));
+                barcelona.Click();
+
+                var stationListDestination = driver.FindElement(By.Id("stationsList"));
+                var amsterdam = stationListDestination.FindElement(By.LinkText("Ámsterdam, Países Bajos (AMS)"));
+                amsterdam.Click();
+            }
+            catch (Exception ex)
+            {
+                // ignored
+            }
+            finally
+            {
+                driver?.Quit();
+            }
+        }
+
+        [TestMethod]
         public void Get()
         {
             IWebDriver driver = null;
